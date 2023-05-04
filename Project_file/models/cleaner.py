@@ -21,3 +21,8 @@ def function(file_name):
             with open('input.txt', 'w') as file:
                 file.write(output)
         return True
+
+
+def filter_numbers(noisy_string):
+    filtered_string = ''.join(filter(str.isdigit, noisy_string))
+    return filtered_string
