@@ -16,6 +16,8 @@ from io import BytesIO
 import torch
 from collections import OrderedDict
 
+import matplotlib.pyplot as plt
+
 class LogisticRegression(nn.Module):
     def __init__(self, n_input_features):
         super(LogisticRegression, self).__init__()
@@ -121,21 +123,21 @@ def function():
     rounded_param = [round(num, 3) for num in param]
     param_str = " ".join(str(num) for num in rounded_param)
 
-    try:
-        with open('C:\\Users\\arjun\\OneDrive\\Desktop\\BTP\\B.Tech-Project---Federated-Learning\\Project_file\\models\\server1.txt', 'w') as file:
+    with open('C:\\Users\\arjun\\OneDrive\\Desktop\\BTP\\B.Tech-Project---Federated-Learning\\Project_file\\models\\server1.txt', 'w') as file:
             file.write(param_str)
-    except Exception as e:
-        print("An error occurred while writing to the file:", e)
+    with open('C:\\Users\\arjun\\OneDrive\\Desktop\\BTP\\B.Tech-Project---Federated-Learning\\Project_file\\models\\accuracy1.txt', 'a') as file:
+        file.write(training_accuracy)
         
-    try:
-        with open('C:\\Users\\arjun\\OneDrive\\Desktop\\BTP\\B.Tech-Project---Federated-Learning\\Project_file\\models\\accuracy1.txt', 'a') as file:
-            file.write(training_accuracy)
-    except Exception as e:
-        print("An error occurred while writing accuracy to the file:", e)
-
+    # rounds = 1
+    # plt.plot(rounds, training_accuracy, 'bo', label='Training acuracy')
+    # plt.title('Training and Validation loss')
+    # plt.xlabel('Rounds')
+    # plt.ylabel('Accuracy')
+    # rounds += 1
     return param_str
 
 print(function())
+
 
 
 
