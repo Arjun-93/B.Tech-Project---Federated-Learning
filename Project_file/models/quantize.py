@@ -8,6 +8,12 @@ def quantize():
     bits = rounded.tobytes()
     return bits
 
-
 quantized = quantize()
 print(quantized)
+
+
+
+
+
+
+

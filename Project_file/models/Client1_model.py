@@ -10,6 +10,12 @@ from sklearn.preprocessing import StandardScaler
 import torch
 import torch.nn as nn
 
+import os
+import torch
+from io import BytesIO
+import torch
+from collections import OrderedDict
+
 class LogisticRegression(nn.Module):
     def __init__(self, n_input_features):
         super(LogisticRegression, self).__init__()
@@ -26,6 +32,9 @@ def clients_training(X_train, y_train, lr):
     criterion = nn.BCELoss() # Binary cross Entropy loss                              
     optimizer = torch.optim.SGD(lr.parameters(), lr=learning_rate) 
     error_loss = []
+    
+    correct  =0
+    total = 0
     for epoch in range(num_epochs):
         train_loss = 0
         optimizer.zero_grad()
@@ -38,8 +47,13 @@ def clients_training(X_train, y_train, lr):
         train_loss += loss.item()*X_train.size(0)
         train_loss = train_loss/1584
         error_loss.append(train_loss)
+        
+        y_pred = torch.round(y_pred)
+        correct += (y_pred.reshape(1584) == y_train).sum().item()
+        total += y_train.size(0)
     total_loss = sum(error_loss)/len(error_loss)
-    return lr.state_dict(), total_loss
+    train_accuracy = correct/total
+    return lr.state_dict(), total_loss, train_accuracy
 
 def get_weights(param_dict):
     weight = param_dict['linear.weight']
@@ -54,29 +68,77 @@ def get_weights(param_dict):
     # print(parameter_list)
     return parameter_list
 
-df = pd.read_csv("C:\\Users\\arjun\\OneDrive\\Desktop\\BTP\\B.Tech-Project---Federated-Learning\\Project_file\\models\\feature_selected_voice_data.csv")
 
-idx = int(len(df)*0.5)
-client1_dataset = df[:idx]
+def is_file_empty(file_path):
+    return os.path.getsize(file_path) == 0
 
-# Client1 dataset -->
-client1_X = client1_dataset.iloc[:,:-1]
-client1_Y = client1_dataset["label"]
-le = preprocessing.LabelEncoder()
-client1_Y = le.fit_transform(client1_Y)
-client1_X = client1_X.to_numpy()
-# client1_Y = client1_Y.to_numpy()
+def read_file(file_path):
+    with open(file_path, 'r') as file:
+        content = file.read()
+    return content
 
-X_train_1 = client1_X.astype('float32')
-y_train_1 = client1_Y.astype('float32')
 
-X_train_1 = torch.from_numpy(X_train_1)
-y_train_1 =torch.from_numpy(y_train_1)
+def check(n_features):
+    model = LogisticRegression(n_features)
+    file_path = 'C:\\Users\\arjun\\OneDrive\\Desktop\\BTP\\B.Tech-Project---Federated-Learning\\Project_file\\models\\average.txt'
+    if os.path.getsize(file_path) == 0:
+        return model
+    else:
+        data_string = read_file(file_path)
+        data_list = data_string.strip().split()
+        # Convert the list of values into a tensor
+        tensor = torch.tensor([float(value) for value in data_list])
+        truncated_tensor = tensor[:13].unsqueeze(0)
+        state_dict = OrderedDict([('linear.weight', truncated_tensor), ('linear.bias', tensor.new_zeros(1))])
+        model.load_state_dict(state_dict)
+        return model
+        
 
-n_samples, n_features = X_train_1.shape
-model = LogisticRegression(n_features)
-param_dict, loss1 = clients_training(X_train_1, y_train_1, model)
+def function():
+    df = pd.read_csv("C:\\Users\\arjun\\OneDrive\\Desktop\\BTP\\B.Tech-Project---Federated-Learning\\Project_file\\models\\feature_selected_voice_data.csv")
+    idx = int(len(df)*0.5)
+    client1_dataset = df[:idx]
 
-param = get_weights(param_dict)
-with open("server1.txt", "w") as file:
-    file.write(param)
+    # Client1 dataset -->
+    client1_X = client1_dataset.iloc[:,:-1]
+    client1_Y = client1_dataset["label"]
+    le = preprocessing.LabelEncoder()
+    client1_Y = le.fit_transform(client1_Y)
+    client1_X = client1_X.to_numpy()
+    # client1_Y = client1_Y.to_numpy()
+
+    X_train_1 = client1_X.astype('float32')
+    y_train_1 = client1_Y.astype('float32')
+
+    X_train_1 = torch.from_numpy(X_train_1)
+    y_train_1 =torch.from_numpy(y_train_1)
+
+    n_samples, n_features = X_train_1.shape
+    model = check(n_features)
+    param_dict, loss1 , training_accuracy = clients_training(X_train_1, y_train_1, model)
+
+    param = get_weights(param_dict)
+    rounded_param = [round(num, 3) for num in param]
+    param_str = " ".join(str(num) for num in rounded_param)
+
+    try:
+        with open('C:\\Users\\arjun\\OneDrive\\Desktop\\BTP\\B.Tech-Project---Federated-Learning\\Project_file\\models\\server1.txt', 'w') as file:
+            file.write(param_str)
+    except Exception as e:
+        print("An error occurred while writing to the file:", e)
+        
+    try:
+        with open('C:\\Users\\arjun\\OneDrive\\Desktop\\BTP\\B.Tech-Project---Federated-Learning\\Project_file\\models\\accuracy1.txt', 'a') as file:
+            file.write(training_accuracy)
+    except Exception as e:
+        print("An error occurred while writing accuracy to the file:", e)
+
+    return param_str
+
+print(function())
+
+
+
+
+
+
