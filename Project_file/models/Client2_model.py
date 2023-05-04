@@ -10,6 +10,7 @@ from sklearn.preprocessing import StandardScaler
 import torch
 import torch.nn as nn
 import os
+import matplotlib.pyplot as plt
 
 def is_file_empty(file_path):
     return os.path.getsize(file_path) == 0
@@ -119,5 +120,13 @@ def function():
         
     with open('C:\\Users\\arjun\\OneDrive\\Desktop\\BTP\\B.Tech-Project---Federated-Learning\\Project_file\\models\\accuracy2.txt', 'a') as file:
             file.write(training_accuracy)
+            
+    # rounds = 1
+    # plt.plot(rounds, training_accuracy, 'bo', label='Training acuracy')
+    # plt.title('Training and Validation loss')
+    # plt.xlabel('Rounds')
+    # plt.ylabel('Accuracy')
+    # rounds += 1
 
+    return param_str
 print(function())

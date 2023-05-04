@@ -1,3 +1,4 @@
+import matplotlib.pyplot as plt
 
 def function():
     with open('server1.txt', 'r') as file:
@@ -18,7 +19,27 @@ def function():
             file2.write(avg_str)
     return avg_str
 
-print(function())
+def read_data(file_path):
+    data = []
+    with open(file_path, 'r') as file:
+        lines = file.readlines()
+        for line in lines:
+            data.append(float(line.strip()))
+    return data
+
+def plot_data(data):
+    x = list(range(1, len(data)+1))
+    plt.plot(x, data)
+    plt.xlabel('Rounds')
+    plt.ylabel('Accuracy')
+    plt.title('Accuracy Plot for Client1')
+    plt.show()
+
+file_path = 'C:\\Users\\arjun\\OneDrive\\Desktop\\BTP\\B.Tech-Project---Federated-Learning\\Project_file\\models\\accuracy1.txt'
+data = read_data(file_path)
+plot_data(data)
+
+# print(function())
 
 
 
