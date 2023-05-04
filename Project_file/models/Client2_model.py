@@ -10,6 +10,7 @@ from sklearn.preprocessing import StandardScaler
 import torch
 import torch.nn as nn
 import os
+from collections import OrderedDict
 import matplotlib.pyplot as plt
 
 def is_file_empty(file_path):
@@ -23,12 +24,17 @@ def read_file(file_path):
 
 def check(n_features):
     model = LogisticRegression(n_features)
-    file_path = "C:\\Users\\arjun\\OneDrive\\Desktop\\BTP\\B.Tech-Project---Federated-Learning\\Project_file\\models\\average.txt"
-    if is_file_empty(file_path):
+    file_path = 'C:\\Users\\arjun\\OneDrive\\Desktop\\BTP\\B.Tech-Project---Federated-Learning\\Project_file\\models\\average.txt'
+    if os.path.getsize(file_path) == 0:
         return model
     else:
-        file_content = read_file(file_path)
-        model.load_state_dict(torch.load(file_content))
+        data_string = read_file(file_path)
+        data_list = data_string.strip().split()
+        # Convert the list of values into a tensor
+        tensor = torch.tensor([float(value) for value in data_list])
+        truncated_tensor = tensor[:13].unsqueeze(0)
+        state_dict = OrderedDict([('linear.weight', truncated_tensor), ('linear.bias', tensor.new_zeros(1))])
+        model.load_state_dict(state_dict)
         return model
 
 class LogisticRegression(nn.Module):
@@ -42,32 +48,37 @@ class LogisticRegression(nn.Module):
         return y_pred
 
 def clients_training(X_train, y_train, lr):
-    num_epochs = 500
-    learning_rate = 0.0001 
-    criterion = nn.BCELoss() # Binary cross Entropy loss                              
+    num_epochs = 10
+    learning_rate = 0.1 
+    criterion = nn.BCEWithLogitsLoss()
     optimizer = torch.optim.SGD(lr.parameters(), lr=learning_rate) 
     error_loss = []
     
-    correct  =0
+    correct = 0
     total = 0
     for epoch in range(num_epochs):
         train_loss = 0
         optimizer.zero_grad()
         y_pred = lr(X_train)
-        loss = criterion(y_pred.reshape(1584), y_train)             
+        
+        # Add random noise to the prediction
+        noise = torch.randn_like(y_pred)
+        y_pred_with_noise = y_pred + noise
+        
+        loss = criterion(y_pred_with_noise.reshape(1584), y_train)             
         loss.backward()
         optimizer.step()
-        # if (epoch+1) % 20 == 0:                                          
-        #     print(f'epoch: {epoch+1}, loss = {loss.item():.4f}')
-        train_loss += loss.item()*X_train.size(0)
-        train_loss = train_loss/1584
+        
+        train_loss += loss.item() * X_train.size(0)
+        train_loss = train_loss / 1584
         error_loss.append(train_loss)
         
-        y_pred = torch.round(y_pred)
+        y_pred = torch.round(torch.sigmoid(y_pred_with_noise))
         correct += (y_pred.reshape(1584) == y_train).sum().item()
         total += y_train.size(0)
-    total_loss = sum(error_loss)/len(error_loss)
-    train_accuracy = correct/total
+    
+    total_loss = sum(error_loss) / len(error_loss)
+    train_accuracy = correct / total
     return lr.state_dict(), total_loss, train_accuracy
 
 def get_weights(param_dict):
@@ -111,7 +122,7 @@ def function():
     param = get_weights(param_dict)
     rounded_param = [round(num, 3) for num in param]
     param_str = " ".join(str(num) for num in rounded_param)
-
+    print(training_accuracy)
     try:
         with open('C:\\Users\\arjun\\OneDrive\\Desktop\\BTP\\B.Tech-Project---Federated-Learning\\Project_file\\models\\server2.txt', 'w') as file:
             file.write(param_str)
@@ -119,14 +130,8 @@ def function():
         print("An error occurred while writing to the file:", e)
         
     with open('C:\\Users\\arjun\\OneDrive\\Desktop\\BTP\\B.Tech-Project---Federated-Learning\\Project_file\\models\\accuracy2.txt', 'a') as file:
-            file.write(training_accuracy)
-            
-    # rounds = 1
-    # plt.plot(rounds, training_accuracy, 'bo', label='Training acuracy')
-    # plt.title('Training and Validation loss')
-    # plt.xlabel('Rounds')
-    # plt.ylabel('Accuracy')
-    # rounds += 1
+            file.write(str(training_accuracy) + "\n")
 
     return param_str
+
 print(function())
