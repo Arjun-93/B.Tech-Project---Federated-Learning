@@ -6,16 +6,47 @@ Client 1 Training
 import pandas as pd
 import numpy as np
 from sklearn import preprocessing
-from sklearn.preprocessing import StandardScaler
+# from sklearn.preprocessing import StandardScaler
 import torch
 import torch.nn as nn
+
+
+def function():
+    df = pd.read_csv('Project_file\\models\\feature_selected_voice_data.csv')
+    idx = int(len(df)*0.5)
+    client1_dataset = df[:idx]
+
+    # Client1 dataset -->
+    client1_X = client1_dataset.iloc[:,:-1]
+    client1_Y = client1_dataset["label"]
+    le = preprocessing.LabelEncoder()
+    client1_Y = le.fit_transform(client1_Y)
+    client1_X = client1_X.to_numpy()
+    # client1_Y = client1_Y.to_numpy()
+
+    X_train_1 = client1_X.astype('float32')
+    y_train_1 = client1_Y.astype('float32')
+
+    X_train_1 = torch.from_numpy(X_train_1)
+    y_train_1 =torch.from_numpy(y_train_1)
+
+    n_samples, n_features = X_train_1.shape
+    model = LogisticRegression(n_features)
+    param_dict, loss1 = clients_training(X_train_1, y_train_1, model)
+
+    param = get_weights(param_dict)
+    param =  (round(x,5) for x in param)
+    # for x in param:
+    #     print((str(abs(x))))
+    str_parm = " ".join(str(y) for y in param)
+    # print(str_parm)
+    return str_parm
 
 class LogisticRegression(nn.Module):
     def __init__(self, n_input_features):
         super(LogisticRegression, self).__init__()
         self.linear = nn.Linear(n_input_features, 1)
         
-    #sigmoid transformation of the input 
     def forward(self, x):
         y_pred = torch.sigmoid(self.linear(x))
         return y_pred
@@ -54,29 +85,11 @@ def get_weights(param_dict):
     # print(parameter_list)
     return parameter_list
 
-df = pd.read_csv("C:\\Users\\arjun\\OneDrive\\Desktop\\BTP\\B.Tech-Project---Federated-Learning\\Project_file\\models\\feature_selected_voice_data.csv")
+strm = function()
+print(strm)
 
-idx = int(len(df)*0.5)
-client1_dataset = df[:idx]
 
-# Client1 dataset -->
-client1_X = client1_dataset.iloc[:,:-1]
-client1_Y = client1_dataset["label"]
-le = preprocessing.LabelEncoder()
-client1_Y = le.fit_transform(client1_Y)
-client1_X = client1_X.to_numpy()
-# client1_Y = client1_Y.to_numpy()
 
-X_train_1 = client1_X.astype('float32')
-y_train_1 = client1_Y.astype('float32')
 
-X_train_1 = torch.from_numpy(X_train_1)
-y_train_1 =torch.from_numpy(y_train_1)
 
-n_samples, n_features = X_train_1.shape
-model = LogisticRegression(n_features)
-param_dict, loss1 = clients_training(X_train_1, y_train_1, model)
 
-param = get_weights(param_dict)
-with open("server1.txt", "w") as file:
-    file.write(param)

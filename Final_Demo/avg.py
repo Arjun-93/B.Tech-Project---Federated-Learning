@@ -1,5 +1,5 @@
 def function():
-    with open('Project_file\\models\\server1.txt', 'r') as file:
+    with open('Final_Demo\\server1.txt', 'r') as file:
         lines = file.readlines()
         list1 = []
         for i in lines[0].split():
@@ -9,7 +9,7 @@ def function():
                 list1.append(0.0)
         #list1 = [float(x) for x in lines[0].split()]
 
-    with open('Project_file\\models\\server1.txt', 'r') as file1:
+    with open('Final_Demo\\server1.txt', 'r') as file1:
         lines1 = file1.readlines()
         list2 = []
         for i in lines1[0].split():
@@ -33,7 +33,7 @@ def function():
     for i in range(len(list1)):
         average = (list1[i] + list2[i]) / 2
         avg_str += str(round(average, 5)) + " "
-        with open('Project_file\models\average.txt', 'w') as file2:
+        with open('Final_Demo\\average.txt', 'w') as file2:
             file2.write(avg_str)
     return avg_str
 

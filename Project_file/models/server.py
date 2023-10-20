@@ -6,8 +6,6 @@ import copy
 from copy import deepcopy
 import matplotlib.pyplot as plt
 
-"""Train """
-
 def ss_train_r(model, rounds, plt_title="Loss Curve"):
 
   

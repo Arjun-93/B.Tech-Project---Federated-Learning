@@ -54,29 +54,36 @@ def get_weights(param_dict):
     # print(parameter_list)
     return parameter_list
 
-df = pd.read_csv("C:\\Users\\arjun\\OneDrive\\Desktop\\BTP\\B.Tech-Project---Federated-Learning\\Project_file\\models\\feature_selected_voice_data.csv")
+def function():
+    df = pd.read_csv('Project_file\\models\\feature_selected_voice_data.csv')
 
-idx = int(len(df)*0.5)
-client2_dataset = df[idx:]
+    idx = int(len(df)*0.5)
+    client2_dataset = df[idx:]
 
-# Client2 Datatset -->
-client2_X = client2_dataset.iloc[:,:-1]
-client2_Y = client2_dataset["label"]
-le = preprocessing.LabelEncoder()
-client2_Y = le.fit_transform(client2_Y)
-client2_X = client2_X.to_numpy()
-# client2_Y = client2_Y.to_numpy()
+    # Client2 Datatset -->
+    client2_X = client2_dataset.iloc[:,:-1]
+    client2_Y = client2_dataset["label"]
+    le = preprocessing.LabelEncoder()
+    client2_Y = le.fit_transform(client2_Y)
+    client2_X = client2_X.to_numpy()
+    # client2_Y = client2_Y.to_numpy()
 
-X_train_2 = client2_X.astype('float32')
-y_train_2 = client2_Y.astype('float32')
+    X_train_2 = client2_X.astype('float32')
+    y_train_2 = client2_Y.astype('float32')
 
-X_train_2 = torch.from_numpy(X_train_2)
-y_train_2 =torch.from_numpy(y_train_2)
+    X_train_2 = torch.from_numpy(X_train_2)
+    y_train_2 =torch.from_numpy(y_train_2)
 
-n_samples, n_features = X_train_2.shape
-model = LogisticRegression(n_features)
-param_dict, loss1 = clients_training(X_train_2, y_train_2, model)
+    n_samples, n_features = X_train_2.shape
+    model = LogisticRegression(n_features)
+    param_dict, loss1 = clients_training(X_train_2, y_train_2, model)
 
-param = get_weights(param_dict)
-with open("server1.txt", "w") as file:
-    file.write(param)
+    param = get_weights(param_dict)
+    param =  (round(x,5) for x in param)
+    # for x in param:
+    #     print((str(abs(x))))
+    str_parm = " ".join(str(y) for y in param)
+    return str_parm
+
+str_param = function()
+print(str_param)
