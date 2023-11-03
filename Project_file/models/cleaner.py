@@ -29,5 +29,13 @@ def function(file_name):
             with open('input.txt', 'w') as file:
                 file.write(output)
         return True
+<<<<<<< HEAD
 remove_null_characters('C:\\Users\\intel\\Desktop\\Arjun Workspace\\B.Tech-Project---Federated-Learning\\Project_file\\models\\servertoclient2.txt', 'C:\\Users\\intel\\Desktop\\Arjun Workspace\\B.Tech-Project---Federated-Learning\\Project_file\\models\\servertoclient2.txt')
 function('C:\\Users\\intel\\Desktop\\Arjun Workspace\\B.Tech-Project---Federated-Learning\\Project_file\\models\\servertoclient2.txt')
+=======
+
+
+def filter_numbers(noisy_string):
+    filtered_string = ''.join(filter(str.isdigit, noisy_string))
+    return filtered_string
+>>>>>>> c2141a36778e0b10fc3105f4142c413f5ec2f56c

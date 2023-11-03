@@ -9,7 +9,19 @@ def quantize(a):
     bits = rounded.tobytes()
     return bits
 
+<<<<<<< HEAD
 a = [1,2,3,4,5,6,7,8,9,10]
 quantized = quantize(a)
 print(quantized)
 
+=======
+quantized = quantize()
+print(quantized)
+
+
+
+
+
+
+
+>>>>>>> c2141a36778e0b10fc3105f4142c413f5ec2f56c

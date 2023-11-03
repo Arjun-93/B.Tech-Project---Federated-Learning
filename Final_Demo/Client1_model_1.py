@@ -1,5 +1,3 @@
-
-
 """
 Client 1 Training
 
@@ -26,11 +24,12 @@ class LogisticRegression(nn.Module):
     
 def clients_training(X_train, y_train, lr):
     num_epochs = 500
-    learning_rate = 0.0001 
+    learning_rate = 0.001 
     criterion = nn.BCELoss() # Binary cross Entropy loss                              
     optimizer = torch.optim.SGD(lr.parameters(), lr=learning_rate) 
     error_loss = []
-    train_accuracy = 0
+    correct = 0
+    total = 0
     for epoch in range(num_epochs):
         train_loss = 0
         optimizer.zero_grad()
@@ -42,7 +41,11 @@ def clients_training(X_train, y_train, lr):
         train_loss += loss.item()*X_train.size(0)
         train_loss = train_loss/1267
         error_loss.append(train_loss)
+        y_pred = torch.round(torch.sigmoid(y_pred))
+        correct += (y_pred.reshape(1267) == y_train).sum().item()
+        total += y_train.size(0)
     total_loss = sum(error_loss)/len(error_loss)
+    train_accuracy = correct/total
     return lr.state_dict(), total_loss, train_accuracy
 
 def get_weights(param_dict):
@@ -51,7 +54,7 @@ def get_weights(param_dict):
 
     weight = weight.tolist()
     bias = bias.tolist()
-
+    
     parameter_list = weight[0]
     parameter_list.append(bias[0])
     # print(len(parameter_list))

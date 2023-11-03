@@ -29,5 +29,8 @@ def function(file_name):
             with open('input.txt', 'w') as file:
                 file.write(output)
         return True
-remove_null_characters('C:\\Users\\intel\\Desktop\\Arjun Workspace\\B.Tech-Project---Federated-Learning\\Project_file\\models\\servertoclient2.txt', 'C:\\Users\\intel\\Desktop\\Arjun Workspace\\B.Tech-Project---Federated-Learning\\Project_file\\models\\servertoclient2.txt')
-function('C:\\Users\\intel\\Desktop\\Arjun Workspace\\B.Tech-Project---Federated-Learning\\Project_file\\models\\servertoclient2.txt')
+remove_null_characters('Final_Demo\\server1.txt', 'Final_Demo\\server1.txt')
+function('Final_Demo\\server1.txt')
+
+remove_null_characters('Final_Demo\\server2.txt', 'Final_Demo\\server2.txt')
+function('Final_Demo\\server2.txt')
